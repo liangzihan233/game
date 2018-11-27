@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{margin: 0;padding: 0}
+        .nav{width: 550px;height: 725px;border: 5px solid black;margin: 0px auto;}
+        .nav li{width: 129px;height: 175px;float: left;list-style: none;margin-top: 5px;margin-left: 5px}
+        .nav img{width: 100%;height: 100%;display: block;border-radius: 5%}
+        ul{position: relative}
+    </style>
+</head>
+<body>
+              <div class="nav">
+                  <ul>
+                      <li id="1"><img src="image/1.gif"></li>
+                      <li id="2"><img src="image/2.gif"></li>
+                      <li id="3"><img src="image/3.gif"></li>
+                      <li id="4"><img src="image/4.gif"></li>
+                      <li id="6"><img src="image/5.gif"></li>
+                      <li id="7"><img src="image/6.gif"></li>
+                      <li id="8"><img src="image/7.gif"></li>
+                      <li id="9"><img src="image/8.gif"></li>
+                      <li id="11"><img src="image/9.gif"></li>
+                      <li id="12"><img src="image/10.gif"></li>
+                      <li id="13"><img src="image/11.gif"></li>
+                      <li id="14"><img src="image/12.gif"></li>
+                      <li id="16"><img src="image/13.gif"></li>
+                      <li id="17"><img src="image/14.gif"></li>
+                      <li id="18"><img src="image/15.gif"></li>
+                      <li id="19"><img src="image/16.gif"></li>
+                  </ul>
+              </div>
+<script>
+    var aLi=document.querySelectorAll('li');/*先选择所有的li标签*/
+    var oNav=document.querySelector(".nav");
+    var liPs=[];
+    for (let i=0,len=aLi.length;i<len;i++){/*for循环遍历所有的li，let解决闭包*/
+        liPs.push([aLi[i].offsetTop,aLi[i].offsetLeft]);/*求出所有的li的位子*/
+        setTimeout(function () {/*定时器解决语句执行顺序问题*/
+            aLi[i].style.position="absolute";/*把所有li设为绝对定位*/
+            aLi[i].style.top=liPs[i][0]+"px";
+            aLi[i].style.left=liPs[i][1]+"px";/*给li定新的位置值*/
+            aLi[i].style.margin="0";/*新的li没有margin，margin重复问题*/
+        },0);
+    }
+   oNav.addEventListener("mousedown",drag);
+    document.addEventListener("mousemove",drag);
+    document.addEventListener("mouseup",drag);/*时间分流，时间监听*/
+    var toggle = false,ele,startX,startY,x1,y1,zIndex=1,weizhi= null,num=0,c=19;
+    function drag(ev) {
+
+
+
+
+
+
+        
+        ev=ev||window.event;/*移动的碰撞目标不包括自己*/
+        ev.preventDefault();/*解除浏览器默认图片不能移动的问题*/
+        switch (ev.type){
+            case "mousedown":
+                if (ev.target.parentNode.getAttribute("id")==c){/*只有19号元素才能出发点击事件*/
+                    toggle = true;/*之有点击后才会执行移动判断*/
+                    ele=ev.target.parentNode;/*ele是鼠标点击单位的父级元素*/
+                    ele.style.zIndex=zIndex++;
+                   startX=ele.offsetLeft;
+                   startY=ele.offsetTop;/*点击时目标li距离边框的距离*/
+                   x1=ev.clientX;
+                   y1=ev.clientY;/*鼠标坐标*/
+                   num=parseInt(ele.getAttribute("id"));/*获取点击目标的id*/
+                }
+                break;
+            case "mousemove":
+                if (toggle){
+                   var  x2=ev.clientX;
+                   var  y2=ev.clientY;/*鼠标实时位置*/
+                   var nowX=startX+x2-x1;/*新的li位置=起始位置+新的鼠标位置-旧鼠标位置*/
+                   var nowY=startY+y2-y1;
+                   ele.style.left=nowX+"px";
+                   ele.style.top=nowY+"px";/*把新li位置附上去*/
+                   var xR=x2-oNav.offsetLeft;
+                   var yR=y2-oNav.offsetTop;/*li相对于边框的位置*/
+                   for (var n=0,len=aLi.length;n<len;n++){
+                       aLi[n].style.transform="";/*每次循环开始恢复放大效果*/
+                       if (
+                           ele!=aLi[n] &&
+                           xR>aLi[n].offsetLeft &&
+                           xR<aLi[n].offsetLeft+129 &&
+                           yR>aLi[n].offsetTop &&
+                           yR<aLi[n].offsetTop+175/*判断鼠标位置是否在被碰撞的元素内部，在则碰撞*/
+                       ){console.log("碰撞");
+                       console.log(yR);
+                           aLi[n].style.transform="scale(1.05)";/*北碰撞放大字体*/
+                          if ((num+1)==aLi[n].getAttribute("id")||(num-1)==aLi[n].getAttribute("id")||(num+5)==aLi[n].getAttribute("id")||(num-5)==aLi[n].getAttribute("id")){
+                              console.log("yes");/*只有上下左右四个方向可以碰撞*/
+                          weizhi=aLi[n];}/*控制移动状态下松开鼠标的事件*/
+                          else{
+                              weizhi=null;/*如果没移动weizhi没有值*/
+                          }
+                       }
+                    }
+                }
+                break;
+            case "mouseup":
+                   if (weizhi){
+                       ele.id=weizhi.getAttribute("id");
+                       c=weizhi.getAttribute("id");/*如果碰撞交换两个元素id*/
+                       ele.style.left=weizhi.offsetLeft+"px";
+                       ele.style.top=weizhi.offsetTop+"px";/*交换两个元素位置*/
+                       weizhi.id=num;
+                       weizhi.style.left=startX+"px";
+                       weizhi.style.top=startY+"px";
+                       weizhi.style.transform="";
+                       weizhi=null;/*把weizhi控制器还原，否则点击空白就会还原*/
+                   }else if(toggle){
+                       ele.style.left=startX+"px";
+                       ele.style.top=startY+"px";/*如果没碰撞松开会还原*/
+                   }
+                toggle = false;/*还原toggle的值*/
+                break
+        }
+    }
+
+</script>
+</body>
+</html>

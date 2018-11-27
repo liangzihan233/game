@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{margin: 0;padding: 0}
+        .nav{width: 439px;height: 640px;border: 5px solid black;margin: 20px auto}
+        .nav li{width: 133px;height: 200px;float: left;list-style: none;margin-top: 10px;margin-left: 10px}
+        .nav img{width: 100%;height: 100%;display: block;border-radius: 5%}
+        ul{position: relative}
+    </style>
+</head>
+<body>
+              <div class="nav">
+                  <ul>
+                      <li><img src="image/2.gif"></li>
+                      <li><img src="image/8.gif"></li>
+                      <li><img src="image/5.gif"></li>
+                      <li><img src="image/3.gif"></li>
+                      <li><img src="image/6.gif"></li>
+                      <li><img src="image/8.gif"></li>
+                      <li><img src="image/7.gif"></li>
+                      <li><img src="image/1.gif"></li>
+                      <li><img src="image/4.gif"></li>
+                  </ul>
+              </div>
+<script>
+    var aLi=document.querySelectorAll('li');/*先选择所有的li标签*/
+    var oNav=document.querySelector(".nav");
+    var liPs=[];
+    for (let i=0,len=aLi.length;i<len;i++){/*for循环遍历所有的li*/
+        liPs.push([aLi[i].offsetTop,aLi[i].offsetLeft]);/*求出所有的li的位子*/
+        setTimeout(function () {
+            aLi[i].style.position="absolute";
+            aLi[i].style.top=liPs[i][0]+"px";
+            aLi[i].style.left=liPs[i][1]+"px";
+            aLi[i].style.margin="0";
+        },0);
+    }
+    oNav.addEventListener("mousedown",drag);
+    document.addEventListener("mousemove",drag);
+    document.addEventListener("mouseup",drag);
+    var toggle = false,ele,startX,startY,x1,y1,zIndex=1,weizhi= null;
+    function drag(ev) {
+        ev=ev||window.event;
+        ev.preventDefault();
+        switch (ev.type){
+            case "mousedown":
+                if (ev.target.parentNode.tagName==="LI"){
+                    toggle = true;
+                    ele=ev.target.parentNode;
+                    ele.style.zIndex=zIndex++;
+                   startX=ele.offsetLeft;
+                   startY=ele.offsetTop;
+                   x1=ev.clientX;
+                   y1=ev.clientY;
+                }
+                break;
+            case "mousemove":
+                if (toggle){
+                   var  x2=ev.clientX;
+                   var  y2=ev.clientY;
+                   var nowX=startX+x2-x1;
+                   var nowY=startY+y2-y1;
+                   ele.style.left=nowX+"px";
+                   ele.style.top=nowY+"px";
+                   var xR=x2-oNav.offsetLeft;
+                   var yR=y2-oNav.offsetTop;
+                   for (var n=0,len=aLi.length;n<len;n++){
+                       aLi[n].style.transform="";
+                       if (
+                           ele!=aLi[n] &&
+                           xR>aLi[n].offsetLeft &&
+                           xR<aLi[n].offsetLeft+133 &&
+                           yR>aLi[n].offsetTop &&
+                           yR<aLi[n].offsetTop+200
+                       ){
+                           console.log("碰撞");
+                           aLi[n].style.transform="scale(1.05)";
+                          weizhi=aLi[n];
+                       }
+                    }
+                }
+                break;
+            case "mouseup":
+                toggle = false;
+                   if (weizhi){
+                       ele.style.left=weizhi.offsetLeft+"px";
+                       ele.style.top=weizhi.offsetTop+"px";
+                       weizhi.style.left=startX+"px";
+                       weizhi.style.top=startY+"px";
+                       weizhi.style.transform="";
+                       weizhi=null;
+                   }
+                break;
+        }
+    }
+
+</script>
+</body>
+</html>
